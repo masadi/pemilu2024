@@ -1,33 +1,20 @@
 <template>
-  <content-with-sidebar class="blog-wrapper">
+  <content-with-sidebar
+    v-if="Object.keys(blogDetail).length"
+    class="cws-container cws-sidebar-right blog-wrapper"
+  >
 
-    <!-- blogs -->
-    <b-row class="blog-list-wrapper">
-      <b-col
-        v-for="blog in blogList"
-        :key="blog.img"
-        md="6"
-      >
-        <b-card
-          tag="article"
-          no-body
-        >
-          <b-link :to="{ name: 'pages-blog-detail', params: { id: blog.id } }">
-            <b-img
-              :src="blog.img"
-              :alt="blog.img.slice(5)"
-              class="card-img-top"
-            />
-          </b-link>
-          <b-card-body>
-            <b-card-title>
-              <b-link
-                :to="{ name: 'pages-blog-detail', params: { id: blog.id } }"
-                class="blog-title-truncate text-body-heading"
-              >
-                {{ blog.title }}
-              </b-link>
-            </b-card-title>
+    <!-- content -->
+    <div class="blog-detail-wrapper">
+      <b-row>
+        <!-- blogs -->
+        <b-col cols="12">
+          <b-card
+            :img-src="blogDetail.blog.img"
+            img-top
+            img-alt="Blog Detail Pic"
+            :title="blogDetail.blog.title"
+          >
             <b-media no-body>
               <b-media-aside
                 vertical-align="center"
@@ -36,22 +23,22 @@
                 <b-avatar
                   href="javascript:void(0)"
                   size="24"
-                  :src="blog.avatar"
+                  :src="blogDetail.blog.avatar"
                 />
               </b-media-aside>
               <b-media-body>
                 <small class="text-muted mr-50">by</small>
                 <small>
-                  <b-link class="text-body">{{ blog.userFullName }}</b-link>
+                  <b-link class="text-body">{{ blogDetail.blog.userFullName }}</b-link>
                 </small>
                 <span class="text-muted ml-75 mr-50">|</span>
-                <small class="text-muted">{{ blog.blogPosted }}</small>
+                <small class="text-muted">{{ blogDetail.blog.createdTime }}</small>
               </b-media-body>
             </b-media>
             <div class="my-1 py-25">
               <b-link
-                v-for="(tag,index) in blog.tags"
-                :key="index"
+                v-for="tag in blogDetail.blog.tags"
+                :key="tag"
               >
                 <b-badge
                   pill
@@ -62,60 +49,217 @@
                 </b-badge>
               </b-link>
             </div>
-            <b-card-text class="blog-content-truncate">
-              {{ blog.excerpt }}
-            </b-card-text>
-            <hr>
-            <div class="d-flex justify-content-between align-items-center">
-              <b-link :to="{ path: `/pages/blog/${blog.id}#blogComment`}">
-                <div class="d-flex align-items-center text-body">
-                  <feather-icon
-                    icon="MessageSquareIcon"
-                    class="mr-50"
-                  />
-                  <span class="font-weight-bold">{{ kFormatter(blog.comment) }} Comments</span>
-                </div>
-              </b-link>
-              <b-link
-                :to="{ name: 'pages-blog-detail', params: { id: blog.id } }"
-                class="font-weight-bold"
-              >
-                Read More
-              </b-link>
-            </div>
-          </b-card-body>
-        </b-card>
-      </b-col>
-      <b-col cols="12">
-        <!-- pagination -->
-        <div class="my-2">
-          <b-pagination
-            v-model="currentPage"
-            align="center"
-            :total-rows="rows"
-            first-number
-            last-number
-            prev-class="prev-item"
-            next-class="next-item"
-          >
-            <template #prev-text>
-              <feather-icon
-                icon="ChevronLeftIcon"
-                size="18"
-              />
-            </template>
-            <template #next-text>
-              <feather-icon
-                icon="ChevronRightIcon"
-                size="18"
-              />
-            </template>
-          </b-pagination>
-        </div>
-      </b-col>
-    </b-row>
+            <!-- eslint-disable vue/no-v-html -->
+            <div
+              class="blog-content"
+              v-html="blogDetail.blog.content"
+            />
 
-    <!--/ blogs -->
+            <!-- user commnets -->
+            <b-media
+              v-for="user in blogDetail.blog.UserComment"
+              :key="user.avatar"
+              no-body
+            >
+              <b-media-aside>
+                <b-avatar
+                  size="60"
+                  :src="user.avatar"
+                />
+              </b-media-aside>
+              <b-media-body>
+                <h6 class="font-weight-bolder">
+                  {{ user.fullName }}
+                </h6>
+                <b-card-text>
+                  {{ user.comment }}
+                </b-card-text>
+              </b-media-body>
+            </b-media>
+            <!-- eslint-enable -->
+            <hr class="my-2">
+
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center mr-1">
+                  <b-link class="mr-50">
+                    <feather-icon
+                      icon="MessageSquareIcon"
+                      size="21"
+                      class="text-body"
+                    />
+                  </b-link>
+                  <b-link>
+                    <div class="text-body">
+                      {{ kFormatter(blogDetail.blog.comments) }}
+                    </div>
+                  </b-link>
+                </div>
+                <div class="d-flex align-items-center">
+                  <b-link class="mr-50">
+                    <feather-icon
+                      size="21"
+                      icon="BookmarkIcon"
+                      class="text-body"
+                    />
+                  </b-link>
+                  <b-link>
+                    <div class="text-body">
+                      {{ kFormatter(blogDetail.blog.bookmarked) }}
+                    </div>
+                  </b-link>
+                </div>
+              </div>
+
+              <!-- dropdown -->
+              <div class="blog-detail-share">
+                <b-dropdown
+                  variant="link"
+                  toggle-class="p-0"
+                  no-caret
+                  right
+                >
+                  <template #button-content>
+                    <feather-icon
+                      size="21"
+                      icon="Share2Icon"
+                      class="text-body"
+                    />
+                  </template>
+                  <b-dropdown-item
+                    v-for="icon in socialShareIcons"
+                    :key="icon"
+                    href="#"
+                  >
+                    <feather-icon
+                      :icon="icon"
+                      size="18"
+                    />
+                  </b-dropdown-item>
+                </b-dropdown>
+              </div>
+              <!--/ dropdown -->
+            </div>
+          </b-card>
+        </b-col>
+        <!--/ blogs -->
+
+        <!-- blog comment -->
+        <b-col
+          id="blogComment"
+          cols="12"
+          class="mt-2"
+        >
+          <h6 class="section-label">
+            Comment
+          </h6>
+          <b-card
+            v-for="(comment,index) in blogDetail.comments"
+            :key="index"
+          >
+            <b-media no-body>
+              <b-media-aside class="mr-75">
+                <b-avatar
+                  :src="comment.avatar"
+                  size="38"
+                />
+              </b-media-aside>
+              <b-media-body>
+                <h6 class="font-weight-bolder mb-25">
+                  {{ comment.userFullName }}
+                </h6>
+                <b-card-text>{{ comment.commentedAt }}</b-card-text>
+                <b-card-text>
+                  {{ comment.commentText }}
+                </b-card-text>
+                <b-link>
+                  <div class="d-inline-flex align-items-center">
+                    <feather-icon
+                      icon="CornerUpLeftIcon"
+                      size="18"
+                      class="mr-50"
+                    />
+                    <span>Reply</span>
+                  </div>
+                </b-link>
+              </b-media-body>
+            </b-media>
+          </b-card>
+        </b-col>
+        <!--/ blog comment -->
+
+        <!-- Leave a Blog Comment -->
+        <b-col
+          cols="12"
+          class="mt-2"
+        >
+          <h6 class="section-label">
+            Leave a Comment
+          </h6>
+          <b-card>
+            <b-form>
+              <b-row>
+                <b-col sm="6">
+                  <b-form-group class="mb-2">
+                    <b-form-input
+                      name="name"
+                      placeholder="Name"
+                    />
+                  </b-form-group>
+                </b-col>
+                <b-col sm="6">
+                  <b-form-group class="mb-2">
+                    <b-form-input
+                      name="email"
+                      type="email"
+                      placeholder="Email"
+                    />
+                  </b-form-group>
+                </b-col>
+                <b-col sm="6">
+                  <b-form-group class="mb-2">
+                    <b-form-input
+                      name="website"
+                      placeholder="Website"
+                    />
+                  </b-form-group>
+                </b-col>
+                <b-col cols="12">
+                  <b-form-group class="mb-2">
+                    <b-form-textarea
+                      name="textarea"
+                      rows="4"
+                      placeholder="Website"
+                    />
+                  </b-form-group>
+                </b-col>
+                <b-col cols="12">
+                  <b-form-checkbox
+                    id="checkbox-1"
+                    v-model="commentCheckmark"
+                    name="checkbox-1"
+                    class="mb-2"
+                  >
+                    Save my name, email, and website in this browser for the next time I comment.
+                  </b-form-checkbox>
+                </b-col>
+                <b-col cols="12">
+                  <b-button
+                    v-ripple.400="'rgba(255, 255, 255, 0.15)'"
+                    variant="primary"
+                  >
+                    Post Comment
+                  </b-button>
+                </b-col>
+              </b-row>
+            </b-form>
+          </b-card>
+        </b-col>
+        <!--/ Leave a Blog Comment -->
+      </b-row>
+      <!--/ blogs -->
+    </div>
+    <!--/ content -->
 
     <!-- sidebar -->
     <div
@@ -154,7 +298,7 @@
           :class="index? 'mt-2':''"
         >
           <b-media-aside class="mr-2">
-            <b-link :to="{ name: 'pages-blog-detail', params:{ id :recentpost.id } }">
+            <b-link>
               <b-img
                 :src="recentpost.img"
                 :alt="recentpost.img.slice(6)"
@@ -166,10 +310,7 @@
           </b-media-aside>
           <b-media-body>
             <h6 class="blog-recent-post-title">
-              <b-link
-                :to="{ name: 'pages-blog-detail', params:{ id :recentpost.id } }"
-                class="text-body-heading"
-              >
+              <b-link class="text-body-heading">
                 {{ recentpost.title }}
               </b-link>
             </h6>
@@ -214,74 +355,77 @@
       </div>
       <!--/ categories -->
     </div>
-    <!--/ sidebar -->
   </content-with-sidebar>
 </template>
 
 <script>
 import {
-  BRow,
-  BCol,
-  BCard,
   BFormInput,
-  BCardText,
-  BCardTitle,
   BMedia,
   BAvatar,
   BMediaAside,
   BMediaBody,
   BImg,
-  BCardBody,
   BLink,
-  BBadge,
   BFormGroup,
   BInputGroup,
   BInputGroupAppend,
-  BPagination,
+  BCard,
+  BRow,
+  BCol,
+  BBadge,
+  BCardText,
+  BDropdown,
+  BDropdownItem,
+  BForm,
+  BFormTextarea,
+  BFormCheckbox,
+  BButton,
 } from 'bootstrap-vue'
+import Ripple from 'vue-ripple-directive'
 import { kFormatter } from '@core/utils/filter'
 import ContentWithSidebar from '@core/layouts/components/content-with-sidebar/ContentWithSidebar.vue'
-import { $themeConfig } from '@themeConfig'
-import store from '@/store/index'
+
 export default {
   components: {
-    BRow,
-    BCol,
-    BCard,
     BFormInput,
-    BCardText,
-    BCardBody,
-    BCardTitle,
     BMedia,
     BAvatar,
     BMediaAside,
     BMediaBody,
     BLink,
-    BBadge,
+    BCard,
+    BRow,
+    BCol,
     BFormGroup,
     BInputGroup,
     BInputGroupAppend,
     BImg,
-    BPagination,
+    BBadge,
+    BCardText,
+    BDropdown,
+    BForm,
+    BDropdownItem,
+    BFormTextarea,
+    BFormCheckbox,
+    BButton,
     ContentWithSidebar,
   },
-  computed: {
-    
+  directives: {
+    Ripple,
   },
   data() {
     return {
       search_query: '',
-      blogList: [],
+      commentCheckmark: '',
+      blogDetail: [],
       blogSidebar: {},
-      currentPage: 1,
-      perPage: 1,
-      rows: 140,
+      socialShareIcons: ['GithubIcon', 'GitlabIcon', 'FacebookIcon', 'TwitterIcon', 'LinkedinIcon'],
     }
   },
   created() {
-    //store.state.appConfig.layout.type = 'horizontal'
-    this.$http.get('/blog/list/data').then(res => {
-      this.blogList = res.data
+    this.$http.get('/blog/list/data/detail').then(res => {
+      this.blogDetail = res.data
     })
     this.$http.get('/blog/list/data/sidebar').then(res => {
       this.blogSidebar = res.data

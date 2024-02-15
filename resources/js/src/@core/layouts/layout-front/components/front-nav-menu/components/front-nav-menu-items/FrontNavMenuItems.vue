@@ -16,7 +16,7 @@
         :item="item"
       />
     </ul>
-    <ul id="main-menu-navigation" class="nav navbar-nav">
+    <!--ul id="main-menu-navigation" class="nav navbar-nav">
       <li class="nav-item">
         <b-link class="nav-link" :to="{ name: 'auth-login' }" v-if="!userData"><span>Login</span></b-link>
         <b-link class="nav-link" :to="{ name: 'dashboard' }" v-else><span>Dashboard</span></b-link>
@@ -25,14 +25,7 @@
         <b-link class="nav-link" :to="{ name: 'auth-register' }" v-if="!userData"><span>Register</span></b-link>
         <b-link class="nav-link" @click="logout" v-else><span>Logout</span></b-link>
       </li>
-      <!--
-        <li class="nav-item">
-        <b-link class="nav-link" :to="{ name: 'auth-login' }">
-        <span>judul</span>
-      </b-link>
-      </li>
-      -->
-    </ul>
+    </ul-->
   </div>
 </template>
 
