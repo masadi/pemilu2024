@@ -20,7 +20,7 @@
           </div>
         </template>
         <template v-slot:cell(provinsi)="row">
-          <template v-if="row.item.wilayah.parrent_recursive.parrent_recursive">
+          <template v-if="row.item.wilayah.parrent_recursive.parrent_recursive.parrent_recursive">
             {{row.item.wilayah.parrent_recursive.parrent_recursive.parrent_recursive.nama}}
           </template>
           <template v-else>
@@ -28,7 +28,7 @@
           </template>
         </template>
         <template v-slot:cell(kabupaten)="row">
-          <template v-if="row.item.wilayah.parrent_recursive.parrent_recursive">
+          <template v-if="row.item.wilayah.parrent_recursive.parrent_recursive.parrent_recursive">
             {{row.item.wilayah.parrent_recursive.parrent_recursive.nama}}
           </template>
           <template v-else>
