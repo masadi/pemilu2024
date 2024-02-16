@@ -42,7 +42,7 @@
     </b-overlay>
     <b-row class="mt-2">
       <b-col md="6">
-        <p>Menampilkan {{ (meta.from) ? meta.from : 0 }} sampai {{ meta.to }} dari {{ meta.total }} entri</p>
+        <p>Menampilkan {{ (meta.from) ? numberWithCommas(meta.from) : 0 }} sampai {{ numberWithCommas(meta.to) }} dari {{ numberWithCommas(meta.total) }} entri</p>
       </b-col>
       <b-col md="6">
         <b-pagination v-model="meta.current_page" :total-rows="meta.total" :per-page="meta.per_page" align="right" @change="changePage" aria-controls="dw-datatable"></b-pagination>
@@ -125,6 +125,9 @@ export default {
     }
   },
   methods: {
+    numberWithCommas(x) {
+      return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ".");
+    },
     edit(item){
       this.$emit('edit', item)
     },
