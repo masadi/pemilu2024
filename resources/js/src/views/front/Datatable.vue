@@ -20,10 +20,20 @@
           </div>
         </template>
         <template v-slot:cell(provinsi)="row">
-          {{row.item.wilayah.parrent_recursive.parrent_recursive.parrent_recursive.nama}}
+          <template v-if="row.item.wilayah.parrent_recursive.parrent_recursive">
+            {{row.item.wilayah.parrent_recursive.parrent_recursive.parrent_recursive.nama}}
+          </template>
+          <template v-else>
+            {{row.item.wilayah.parrent_recursive.parrent_recursive.nama}}
+          </template>
         </template>
         <template v-slot:cell(kabupaten)="row">
-          {{row.item.wilayah.parrent_recursive.parrent_recursive.nama}}
+          <template v-if="row.item.wilayah.parrent_recursive.parrent_recursive">
+            {{row.item.wilayah.parrent_recursive.parrent_recursive.nama}}
+          </template>
+          <template v-else>
+            {{row.item.wilayah.parrent_recursive.nama}}
+          </template>
         </template>
         <template v-slot:cell(kecamatan)="row">
           {{row.item.wilayah.parrent_recursive.nama}}
