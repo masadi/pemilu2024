@@ -8,7 +8,25 @@ use App\Models\Tps;
 class KpuController extends Controller
 {
     public function index(){
-        $data = Tps::with(['wilayah' => function($query){
+        $data = Tps::where(function($query){
+            if(request()->luar){
+                $query->whereHas('wilayah', function($query){
+                    $query->whereHas('parent', function($query){
+                        $query->whereHas('parent', function($query){
+                            $query->where('id_wilayah', '99');   
+                        });
+                    });
+                });
+            } else {
+                $query->whereHas('wilayah', function($query){
+                    $query->whereHas('parent', function($query){
+                        $query->whereHas('parent', function($query){
+                            $query->where('id_wilayah', '<>', '99');   
+                        });
+                    });
+                });
+            }
+        })->with(['wilayah' => function($query){
             $query->with(['parrentRecursive']);
         }])->orderBy(request()->sortby, request()->sortbydesc)
         ->when(request()->q, function($query) {

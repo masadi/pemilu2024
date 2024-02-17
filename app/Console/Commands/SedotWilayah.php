@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use App\Models\Wilayah;
 use App\Models\Tps;
 
@@ -33,6 +34,11 @@ class SedotWilayah extends Command
     public $base_suara = 'https://sirekap-obj-data.kpu.go.id/pemilu/hhcw/ppwp';
     public function handle()
     {
+        //Log::debug('Start sedot:wilayah');
+        Log::build([
+            'driver' => 'single',
+            'path' => storage_path('logs/sedot-wilayah.log'),
+        ])->info('Start sedot:wilayah');
         $this->get_wilayah();
         //$this->start();
         return Command::SUCCESS;

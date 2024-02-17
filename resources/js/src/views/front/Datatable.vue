@@ -4,12 +4,19 @@
       <b-col md="4" class="mb-2">
         <b-form-select v-model="meta.per_page" :options="[10, 25, 50, 100]" @change="loadPerPage"></b-form-select>
       </b-col>
-      <b-col md="4" class="mb-2">
-        <b-form-select v-model="opsi" :options="data_opsi" @change="changeOpsi"></b-form-select>
-      </b-col>
-      <b-col md="4" class="mb-2">
-        <b-form-input @input="search" placeholder="Cari data..."></b-form-input>
-      </b-col>
+      <template v-if="meta.luar">
+        <b-col md="4" offset-md="4">
+          <b-form-input @input="search" placeholder="Cari data..."></b-form-input>
+        </b-col>
+      </template>
+      <template v-else>
+        <b-col md="4" class="mb-2">
+          <b-form-select v-model="opsi" :options="data_opsi" @change="changeOpsi"></b-form-select>
+        </b-col>
+        <b-col md="4" class="mb-2">
+          <b-form-input @input="search" placeholder="Cari data..."></b-form-input>
+        </b-col>
+      </template>
     </b-row>
     <b-overlay :show="loading" rounded opacity="0.6" size="lg" spinner-variant="warning">
       <b-table responsive bordered striped :items="items" :fields="fields" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" show-empty :busy="isBusy">

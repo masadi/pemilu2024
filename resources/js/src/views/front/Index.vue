@@ -7,7 +7,20 @@
       </div>
       <div v-else>
         <h2>Data diambil dari website pemilu2024.kpu.go.id dan di update secara berkala</h2>
-        <datatable :isBusy="isBusy" :loading="loading" :items="items" :fields="fields" :meta="meta" @per_page="handlePerPage" @pagination="handlePagination" @search="handleSearch" @opsi="handleOpsi" />
+        <b-card no-body>
+          <b-tabs pills card @input="changeTab">
+            <b-tab title="Dalam Negeri" active>
+              <b-card-text>
+                <datatable :isBusy="isBusy" :loading="loading" :items="items" :fields="fields" :meta="meta" @per_page="handlePerPage" @pagination="handlePagination" @search="handleSearch" @opsi="handleOpsi" />
+              </b-card-text>
+            </b-tab>
+            <b-tab title="Luar Negeri">
+              <b-card-text>
+                <datatable :isBusy="isBusy" :loading="loading" :items="items" :fields="fields" :meta="meta" @per_page="handlePerPage" @pagination="handlePagination" @search="handleSearch" @opsi="handleOpsi" />
+              </b-card-text>
+            </b-tab>
+          </b-tabs>
+        </b-card>
       </div>
     </b-card-body>
   </b-card>
@@ -15,80 +28,23 @@
 
 <script>
 /* eslint-disable global-require */
-import { BCard, BCardBody, BSpinner } from 'bootstrap-vue'
+import { BCard, BCardBody, BCardText, BSpinner, BTabs, BTab } from 'bootstrap-vue'
 import Datatable from './Datatable.vue'
 export default {
   components: {
     BCard,
     BCardBody,
+    BCardText,
     BSpinner,
+    BTabs,
+    BTab,
     Datatable
   },
   data() {
     return {
       isBusy: true,
       loading: true,
-      fields: [
-        {
-          key: 'provinsi',
-          label: 'Provinsi',
-          sortable: false,
-          thClass: 'text-center',
-        },
-        {
-          key: 'kabupaten',
-          label: 'Kab/Kota',
-          sortable: false,
-          thClass: 'text-center',
-        },
-        {
-          key: 'kecamatan',
-          label: 'Kecamatan/Distrik',
-          sortable: false,
-          thClass: 'text-center',
-        },
-        {
-          key: 'desa',
-          label: 'Desa/Kelurahan',
-          sortable: false,
-          thClass: 'text-center',
-        },
-        {
-          key: 'nama',
-          label: 'TPS',
-          sortable: false,
-          thClass: 'text-center',
-          tdClass: 'text-center'
-        },
-        {
-          key: 'paslon_1',
-          label: '01',
-          sortable: false,
-          thClass: 'text-center',
-          tdClass: 'text-center'
-        },
-        {
-          key: 'paslon_2',
-          label: '02',
-          sortable: false,
-          thClass: 'text-center',
-          tdClass: 'text-center'
-        },
-        {
-          key: 'paslon_3',
-          label: '03',
-          sortable: false,
-          thClass: 'text-center',
-          tdClass: 'text-center'
-        },
-        {
-          key: 'link',
-          label: 'Link KPU',
-          sortable: false,
-          thClass: 'text-center',
-          tdClass: 'text-center'
-        },
-      ],
+      fields: [],
       items: [],
       meta: {},
       current_page: 1, //DEFAULT PAGE YANG AKTIF ADA PAGE 1
@@ -97,6 +53,7 @@ export default {
       sortBy: 'created_at', //DEFAULT SORTNYA ADALAH CREATED_AT
       sortByDesc: false, //ASCEDING
       opsi: null,
+      luar: 0,
     }
   },
   created() {
@@ -110,6 +67,7 @@ export default {
       //LAKUKAN REQUEST KE API UNTUK MENGAMBIL DATA POSTINGAN
       this.$http.get('/rekap', {
         params: {
+          luar: this.luar,
           page: current_page,
           per_page: this.per_page,
           q: this.search,
@@ -132,6 +90,7 @@ export default {
           to: getData.to,
           role_id: this.role_id,
           roles: response.data.roles,
+          luar: this.luar,
         }
       })
     },
@@ -158,6 +117,130 @@ export default {
       this.opsi = val
       this.loadPostsData() //REQUEST DATA BARU
     },
+    changeTab(val){
+      this.luar = val
+      if(val){
+        this.fields = [
+          {
+            key: 'provinsi',
+            label: 'Wilayah',
+            sortable: false,
+            thClass: 'text-center',
+          },
+          {
+            key: 'kabupaten',
+            label: 'Negara',
+            sortable: false,
+            thClass: 'text-center',
+          },
+          {
+            key: 'kecamatan',
+            label: 'Negara',
+            sortable: false,
+            thClass: 'text-center',
+          },
+          {
+            key: 'nama',
+            label: 'TPS',
+            sortable: false,
+            thClass: 'text-center',
+            tdClass: 'text-center'
+          },
+          {
+            key: 'paslon_1',
+            label: '01',
+            sortable: false,
+            thClass: 'text-center',
+            tdClass: 'text-center'
+          },
+          {
+            key: 'paslon_2',
+            label: '02',
+            sortable: false,
+            thClass: 'text-center',
+            tdClass: 'text-center'
+          },
+          {
+            key: 'paslon_3',
+            label: '03',
+            sortable: false,
+            thClass: 'text-center',
+            tdClass: 'text-center'
+          },
+          {
+            key: 'link',
+            label: 'Link KPU',
+            sortable: false,
+            thClass: 'text-center',
+            tdClass: 'text-center'
+          },
+        ];
+      } else {
+        this.fields = [
+          {
+            key: 'provinsi',
+            label: 'Provinsi',
+            sortable: false,
+            thClass: 'text-center',
+          },
+          {
+            key: 'kabupaten',
+            label: 'Kab/Kota',
+            sortable: false,
+            thClass: 'text-center',
+          },
+          {
+            key: 'kecamatan',
+            label: 'Kecamatan/Distrik',
+            sortable: false,
+            thClass: 'text-center',
+          },
+          {
+            key: 'desa',
+            label: 'Desa/Kelurahan',
+            sortable: false,
+            thClass: 'text-center',
+          },
+          {
+            key: 'nama',
+            label: 'TPS',
+            sortable: false,
+            thClass: 'text-center',
+            tdClass: 'text-center'
+          },
+          {
+            key: 'paslon_1',
+            label: '01',
+            sortable: false,
+            thClass: 'text-center',
+            tdClass: 'text-center'
+          },
+          {
+            key: 'paslon_2',
+            label: '02',
+            sortable: false,
+            thClass: 'text-center',
+            tdClass: 'text-center'
+          },
+          {
+            key: 'paslon_3',
+            label: '03',
+            sortable: false,
+            thClass: 'text-center',
+            tdClass: 'text-center'
+          },
+          {
+            key: 'link',
+            label: 'Link KPU',
+            sortable: false,
+            thClass: 'text-center',
+            tdClass: 'text-center'
+          },
+        ];
+      }
+      this.loadPostsData()
+      console.log(val);
+    }
   },
 }
 </script>
