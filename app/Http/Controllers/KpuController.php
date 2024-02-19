@@ -44,4 +44,13 @@ class KpuController extends Controller
         })->paginate(request()->per_page);
         return response()->json(['status' => 'success', 'data' => $data]);
     }
+    public function update_suara(){
+        if(request()->token == 'bismillah'){
+            $find = Tps::find(request()->id);
+            $find->paslon_1 = request()->paslon_1;
+            $find->paslon_2 = request()->paslon_2;
+            $find->paslon_3 = request()->paslon_3;
+            $find->save();
+        }
+    }
 }

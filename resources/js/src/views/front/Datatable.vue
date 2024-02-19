@@ -55,6 +55,9 @@
         <template v-slot:cell(link)="row">
           <b-button variant="outline-primary" size="sm" :href="`https://pemilu2024.kpu.go.id/pilpres/hitung-suara/${row.item.wilayah.parrent_recursive.parrent_recursive.parrent_recursive.kode}/${row.item.wilayah.parrent_recursive.parrent_recursive.kode}/${row.item.wilayah.parrent_recursive.kode}/${row.item.wilayah.kode}/${row.item.kode}`" target="_blank">Kunjungi</b-button>
         </template>
+        <template v-slot:cell(actions)="row">
+          <b-button variant="outline-warning" size="sm" @click="edit(row.item)">Update</b-button>
+        </template>
       </b-table>
     </b-overlay>
     <b-row class="mt-2">
@@ -65,16 +68,33 @@
         <b-pagination v-model="meta.current_page" :total-rows="meta.total" :per-page="meta.per_page" align="right" @change="changePage" aria-controls="dw-datatable"></b-pagination>
       </b-col>
     </b-row>
+    <b-modal id="modal-prevent-closing" v-model="modalEdit" title="Update Perolehan Suara" @hidden="resetModal" @ok="handleOk" ok-title="Submit">
+      <form ref="form" @submit.stop.prevent="handleSubmit">
+        <b-form-group label="Token" label-for="token" invalid-feedback="Token tidak boleh kosong" :state="state.token">
+          <b-form-input id="token" v-model="form.token" :state="state.token" required></b-form-input>
+        </b-form-group>
+        <b-form-group label="Paslon 01" label-for="paslon_1" invalid-feedback="Suara Paslon 01 tidak boleh kosong" :state="state.paslon_1">
+          <b-form-input id="paslon_1" v-model="form.paslon_1" :state="state.paslon_1" required></b-form-input>
+        </b-form-group>
+        <b-form-group label="Paslon 02" label-for="paslon_2" invalid-feedback="Suara Paslon 03 tidak boleh kosong" :state="state.paslon_2">
+          <b-form-input id="paslon_2" v-model="form.paslon_2" :state="state.paslon_2" required></b-form-input>
+        </b-form-group>
+        <b-form-group label="Paslon 03" label-for="paslon_3" invalid-feedback="Suara Paslon 03 tidak boleh kosong" :state="state.paslon_3">
+          <b-form-input id="paslon_3" v-model="form.paslon_3" :state="state.paslon_3" required></b-form-input>
+        </b-form-group>
+      </form>
+    </b-modal>
   </div>
 </template>
 
 <script>
 import _ from 'lodash' //IMPORT LODASH, DIMANA AKAN DIGUNAKAN UNTUK MEMBUAT DELAY KETIKA KOLOM PENCARIAN DIISI
-import { BRow, BCol, BFormInput, BFormSelect, BFormSelectOption, BTable, BSpinner, BPagination, BButton, BOverlay, BDropdown, BDropdownItem, BBadge } from 'bootstrap-vue'
+import { BRow, BCol, BFormGroup, BFormInput, BFormSelect, BFormSelectOption, BTable, BSpinner, BPagination, BButton, BOverlay, BDropdown, BDropdownItem, BBadge } from 'bootstrap-vue'
 export default {
   components: {
     BRow,
     BCol,
+    BFormGroup,
     BFormInput, BFormSelect, BFormSelectOption,
     BTable,
     BSpinner,
@@ -125,6 +145,26 @@ export default {
         { value: null, text: 'Semua Data' },
         { value: 1, text: 'DPT > 300' }
       ],
+      form: {
+        id: '',
+        token: '',
+        paslon_1: '',
+        paslon_2: '',
+        paslon_3: '',
+      },
+      feedback: {
+        token: '',
+        paslon_1: '',
+        paslon_2: '',
+        paslon_3: '',
+      },
+      state: {
+        token: null,
+        paslon_1: null,
+        paslon_2: null,
+        paslon_3: null,
+      },
+      modalEdit: false,
     }
   },
   watch: {
@@ -163,6 +203,61 @@ export default {
     search: _.debounce(function (e) {
       this.$emit('search', e)
     }, 500),
+    edit(item){
+      this.modalEdit = true
+      this.form.id = item.id
+      console.log(item.id);
+      console.log(item);
+    },
+    checkFormValidity() {
+      const valid = this.$refs.form.checkValidity()
+      this.state.token = valid
+      this.state.paslon_1 = valid
+      this.state.paslon_2 = valid
+      this.state.paslon_3 = valid
+      return valid
+    },
+    resetModal() {
+      this.form.id = ''
+      this.form.token = ''
+      this.form.paslon_1 = ''
+      this.form.paslon_2 = ''
+      this.form.paslon_3 = ''
+      this.state.token = null
+      this.state.paslon_1 = null
+      this.state.paslon_2 = null
+      this.state.paslon_3 = null
+      this.feedback.token = ''
+      this.feedback.paslon_1 = ''
+      this.feedback.paslon_2 = ''
+      this.feedback.paslon_3 = ''
+    },
+    handleOk(bvModalEvent) {
+      // Prevent modal from closing
+      bvModalEvent.preventDefault()
+      // Trigger submit handler
+      this.handleSubmit()
+    },
+    handleSubmit() {
+      // Exit when the form isn't valid
+      if (!this.checkFormValidity()) {
+        return
+      }
+      this.$http.post('/update-suara', this.form).then(response => {
+        let getData = response.data
+        console.log(getData);
+        this.modalEdit = false
+        this.loadPerPage(this.meta.per_page)
+      });
+      // Push the name to submitted names
+      //this.submittedNames.push(this.name)
+      // Hide the modal manually
+      /*this.$nextTick(() => {
+        //this.$bvModal.hide('modal-prevent-closing')
+        this.modalEdit = false
+        this.loadPerPage(this.meta.per_page)
+      })*/
+    },
   },
 }
 </script>

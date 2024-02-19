@@ -14,3 +14,4 @@ use App\Http\Controllers\KpuController;
 |
 */
 Route::get('rekap', [KpuController::class, 'index'])->name('kpu');
+Route::post('update-suara', [KpuController::class, 'update_suara'])->name('update-suara');

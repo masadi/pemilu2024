@@ -77,6 +77,21 @@ return [
             'search_path' => 'public',
             'sslmode' => 'prefer',
         ],
+        
+        'armet' => [
+            'driver' => 'pgsql',
+            'url' => env('DATABASE_URL'),
+            'host' => env('DB_HOST_ARMET', '127.0.0.1'),
+            'port' => env('DB_PORT_ARMET', '5432'),
+            'database' => env('DB_DATABASE_ARMET', 'forge'),
+            'username' => env('DB_USERNAME_ARMET', 'forge'),
+            'password' => env('DB_PASSWORD_ARMET', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => 'public',
+            'sslmode' => 'prefer',
+        ],
 
         'sqlsrv' => [
             'driver' => 'sqlsrv',

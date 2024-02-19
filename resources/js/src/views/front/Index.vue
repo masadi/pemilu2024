@@ -50,14 +50,15 @@ export default {
       current_page: 1, //DEFAULT PAGE YANG AKTIF ADA PAGE 1
       per_page: 10, //DEFAULT LOAD PERPAGE ADALAH 10
       search: '',
-      sortBy: 'created_at', //DEFAULT SORTNYA ADALAH CREATED_AT
+      sortBy: 'kode', //DEFAULT SORTNYA ADALAH CREATED_AT
       sortByDesc: false, //ASCEDING
       opsi: null,
       luar: 0,
     }
   },
   created() {
-    this.loadPostsData()
+    this.changeTab(0)
+    //this.loadPostsData()
   },
   methods: {
     loadPostsData() {
@@ -168,6 +169,13 @@ export default {
             tdClass: 'text-center'
           },
           {
+            key: 'actions',
+            label: 'Edit',
+            sortable: false,
+            thClass: 'text-center',
+            tdClass: 'text-center'
+          },
+          {
             key: 'link',
             label: 'Link KPU',
             sortable: false,
@@ -230,6 +238,13 @@ export default {
             tdClass: 'text-center'
           },
           {
+            key: 'actions',
+            label: 'Edit',
+            sortable: false,
+            thClass: 'text-center',
+            tdClass: 'text-center'
+          },
+          {
             key: 'link',
             label: 'Link KPU',
             sortable: false,
@@ -239,8 +254,9 @@ export default {
         ];
       }
       this.loadPostsData()
+      console.log(this.loading)
       console.log(val);
-    }
+    },
   },
 }
 </script>

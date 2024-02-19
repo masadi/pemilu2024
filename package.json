@@ -65,6 +65,7 @@
     "prismjs": "^1.24.1",
     "pusher-js": "^8.3.0",
     "swiper": "^5.4.5",
+    "universal-social-auth": "^0.2.6",
     "uuid": "^8.3.2",
     "vee-validate": "^3.4.11",
     "vue": "2.6.12",
